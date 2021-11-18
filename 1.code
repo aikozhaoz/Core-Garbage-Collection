@@ -1,7 +1,0 @@
-program
-	int x;
-begin
-	ref y;
-	y = new;
-	y = 10;
-end
