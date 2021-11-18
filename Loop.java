@@ -45,6 +45,7 @@ public class Loop {
             HashMap<String, Corevar> scopeone = new HashMap<>();
             Memory.stackSpace.peek().push(scopeone);
             stmtseq.execute(inputScanner);
+            // prevLiveCount = the amount of live variables within the whole while block
             int prevLiveCount = Memory.liveCount;
             // Clear all the local variable's corresponding refCount
             for (String key : Memory.stackSpace.peek().peek().keySet()) {
@@ -53,18 +54,18 @@ public class Loop {
                 Memory.refCount.set(localCorevar.value, 0);
             }
             Memory.countLiveRefs();
-            if (prevLiveCount!=Memory.liveCount){
-                System.out.println("gc:"+Memory.liveCount);
+            if (prevLiveCount != Memory.liveCount) {
+                System.out.println("gc:" + Memory.liveCount);
             }
         }
         // End Scope
-        
-        // Pop scope out
+        // Pop scope out - double check, allegedly we never really need to run line
+        // 63-68.
         Memory.stackSpace.peek().pop();
         int prevLiveCount = Memory.liveCount;
         Memory.countLiveRefs();
-        if (prevLiveCount!=Memory.liveCount){
-            System.out.println("gc:"+Memory.liveCount);
+        if (prevLiveCount != Memory.liveCount) {
+            System.out.println("gc:" + Memory.liveCount);
         }
     }
 

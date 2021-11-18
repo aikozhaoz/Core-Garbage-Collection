@@ -90,8 +90,8 @@ public class If {
                 Memory.stackSpace.peek().pop();
                 int prevLiveCount = Memory.liveCount;
                 Memory.countLiveRefs();
-                if (prevLiveCount!=Memory.liveCount){
-                    System.out.println("gc:"+Memory.liveCount);
+                if (prevLiveCount != Memory.liveCount) {
+                    System.out.println("gc:" + Memory.liveCount);
                 }
             }
         } else if (option == 2) {
@@ -100,6 +100,8 @@ public class If {
                 HashMap<String, Corevar> scopeone = new HashMap<>();
                 Memory.stackSpace.peek().push(scopeone);
                 stmtseqone.execute(inputScanner);
+                // prevLiveCount = the amount of live variables within the whole if block BEFORE
+                // POP it
                 int prevLiveCount = Memory.liveCount;
                 // End scope
                 // Clear all the local variable's corresponding refCount
@@ -111,14 +113,16 @@ public class If {
                 // Pop scope out
                 Memory.stackSpace.peek().pop();
                 Memory.countLiveRefs();
-                if (prevLiveCount!=Memory.liveCount){
-                    System.out.println("gc:"+Memory.liveCount);
+                if (prevLiveCount != Memory.liveCount) {
+                    System.out.println("gc:" + Memory.liveCount);
                 }
             } else {
                 // Enter a new scope
                 HashMap<String, Corevar> scopetwo = new HashMap<>();
                 Memory.stackSpace.peek().push(scopetwo);
                 stmtseqtwo.execute(inputScanner);
+                // prevLiveCount = the amount of live variables within the whole else block
+                // BEFORE POP it
                 int prevLiveCount = Memory.liveCount;
                 // End scope
                 // Clear all the local variable's corresponding refCount
@@ -129,10 +133,10 @@ public class If {
                 }
                 // Pop scope out
                 Memory.stackSpace.peek().pop();
-                
+
                 Memory.countLiveRefs();
-                if (prevLiveCount!=Memory.liveCount){
-                    System.out.println("gc:"+Memory.liveCount);
+                if (prevLiveCount != Memory.liveCount) {
+                    System.out.println("gc:" + Memory.liveCount);
                 }
             }
         }

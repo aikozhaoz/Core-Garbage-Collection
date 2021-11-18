@@ -95,7 +95,10 @@ public class Funccall {
                 Utility.UseUndeclaredIdError(id);
                 System.exit(-1);
             }
-            Memory.refCount.set(param.value, Memory.refCount.get(param.value)+1);
+
+            // Incrementing actual parameters' ref counts since now formal parameters also
+            // point to actual parameters
+            Memory.refCount.set(param.value, Memory.refCount.get(param.value) + 1);
 
             // After gathering key = formal parameter and value = corresponding actual
             // parameter's Corevar, put the pair to funcSpace
@@ -108,19 +111,22 @@ public class Funccall {
         // Put funcstack to stackSpace.
         Memory.stackSpace.push(funcstack);
 
+        // prevRefCountSize = refCount's size before executing the function call
         int prevRefCountSize = Memory.refCount.size();
         // Now execute function.
         function.getFunctionBody().execute(inputScanner);
+        // prevLiveCount = the amount of live variables within the whole function block
         int prevLiveCount = Memory.liveCount;
-        if(Memory.refCount.size()>prevRefCountSize){
-                // Clear all the local variable's corresponding refCount
-            for (HashMap <String, Corevar> currentscope : Memory.stackSpace.peek()) {
-                // Clear all the local variable's corresponding refCount
+        // If prevRefCountSize == Memory.refCount.size(), we did not allocate any new
+        // ref variable within the function scope. No need to clear.
+        if (Memory.refCount.size() > prevRefCountSize) {
+            // Decrementing all the local variable's corresponding refCount
+            for (HashMap<String, Corevar> currentscope : Memory.stackSpace.peek()) {
                 for (String key : currentscope.keySet()) {
                     String id = key;
                     Corevar localCorevar = currentscope.get(id);
-                    if(Memory.refCount.get(localCorevar.value)!=0){
-                        Memory.refCount.set(localCorevar.value, Memory.refCount.get(localCorevar.value)-1);
+                    if (Memory.refCount.get(localCorevar.value) != 0) {
+                        Memory.refCount.set(localCorevar.value, Memory.refCount.get(localCorevar.value) - 1);
                     }
                 }
             }
@@ -128,8 +134,8 @@ public class Funccall {
         // After funtion's execution, pop the function call from the stackSpace.
         Memory.stackSpace.pop();
         Memory.countLiveRefs();
-        if (prevLiveCount!=Memory.liveCount){
-            System.out.println("gc:"+Memory.liveCount);
+        if (prevLiveCount != Memory.liveCount) {
+            System.out.println("gc:" + Memory.liveCount);
         }
     }
 

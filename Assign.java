@@ -153,31 +153,36 @@ public class Assign {
                 leftvar.value = Memory.heapSpace.size() - 1;
                 Memory.refCount.add(1);
                 Memory.liveCount++;
-                System.out.println("gc:"+Memory.liveCount);
+                System.out.println("gc:" + Memory.liveCount);
             }
         }
         // Option 2: <assign> ::= id = ref id;
         else if (option == 2) {
             if (leftvar.type == Core.REF && rightvar.type == Core.REF) {
+                // Get prevLiveCount first so we can compare it with livecount after the
+                // assignment
+                int prevLiveCount = Memory.liveCount;
                 leftvar.value = rightvar.value;
-                // Since heapSpace and refCount share the same indexes, for all the ref variables:
+                // Since heapSpace and refCount share the same indexes, for all the ref
+                // variables:
                 // Get the leftvarrefcount and rightrefcount
                 // leftvarrefcount -=1
                 // rightrefcount +=1
-                if (leftvar.value!=null){
+                // Note: Check if leftvar and rightvar != null first!
+                if (leftvar.value != null) {
                     int leftvarRefCount = Memory.refCount.get(leftvar.value);
-                    leftvarRefCount-=1;
+                    leftvarRefCount -= 1;
                     Memory.refCount.set(leftvar.value, leftvarRefCount);
                 }
-                if (rightvar.value!=null){
+                if (rightvar.value != null) {
                     int rightvarRefCount = Memory.refCount.get(rightvar.value);
-                    rightvarRefCount+=1;
+                    rightvarRefCount += 1;
                     Memory.refCount.set(rightvar.value, rightvarRefCount);
                 }
-                int prevLiveCount = Memory.liveCount;
+                // Get livecount after the assignment
                 Memory.countLiveRefs();
-                if (prevLiveCount!=Memory.liveCount){
-                    System.out.println("gc:"+Memory.liveCount);
+                if (prevLiveCount != Memory.liveCount) {
+                    System.out.println("gc:" + Memory.liveCount);
                 }
             }
         }
