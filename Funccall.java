@@ -95,6 +95,7 @@ public class Funccall {
                 Utility.UseUndeclaredIdError(id);
                 System.exit(-1);
             }
+            Memory.refCount.set(param.value, Memory.refCount.get(param.value)+1);
 
             // After gathering key = formal parameter and value = corresponding actual
             // parameter's Corevar, put the pair to funcSpace
@@ -106,23 +107,30 @@ public class Funccall {
         funcstack.push(funcSpace);
         // Put funcstack to stackSpace.
         Memory.stackSpace.push(funcstack);
+
+        int prevRefCountSize = Memory.refCount.size();
         // Now execute function.
         function.getFunctionBody().execute(inputScanner);
-        
-        // Clear all the local variable's corresponding refCount
-        for (HashMap <String, Corevar> currentscope : Memory.stackSpace.peek()) {
-            // Clear all the local variable's corresponding refCount
-            for (String key : currentscope.keySet()) {
-                String id = key;
-                Corevar localCorevar = currentscope.get(id);
-                Memory.refCount.set(localCorevar.value, 0);
+        int prevLiveCount = Memory.liveCount;
+        if(Memory.refCount.size()>prevRefCountSize){
+                // Clear all the local variable's corresponding refCount
+            for (HashMap <String, Corevar> currentscope : Memory.stackSpace.peek()) {
+                // Clear all the local variable's corresponding refCount
+                for (String key : currentscope.keySet()) {
+                    String id = key;
+                    Corevar localCorevar = currentscope.get(id);
+                    if(Memory.refCount.get(localCorevar.value)!=0){
+                        Memory.refCount.set(localCorevar.value, Memory.refCount.get(localCorevar.value)-1);
+                    }
+                }
             }
         }
         // After funtion's execution, pop the function call from the stackSpace.
         Memory.stackSpace.pop();
-
         Memory.countLiveRefs();
-        System.out.println("gc:"+Memory.liveCount);
+        if (prevLiveCount!=Memory.liveCount){
+            System.out.println("gc:"+Memory.liveCount);
+        }
     }
 
     public void print() {

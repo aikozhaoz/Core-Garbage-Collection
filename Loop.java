@@ -45,18 +45,27 @@ public class Loop {
             HashMap<String, Corevar> scopeone = new HashMap<>();
             Memory.stackSpace.peek().push(scopeone);
             stmtseq.execute(inputScanner);
+            int prevLiveCount = Memory.liveCount;
+            // Clear all the local variable's corresponding refCount
+            for (String key : Memory.stackSpace.peek().peek().keySet()) {
+                String id = key;
+                Corevar localCorevar = Memory.stackSpace.peek().peek().get(id);
+                Memory.refCount.set(localCorevar.value, 0);
+            }
+            Memory.countLiveRefs();
+            if (prevLiveCount!=Memory.liveCount){
+                System.out.println("gc:"+Memory.liveCount);
+            }
         }
         // End Scope
-        // Clear all the local variable's corresponding refCount
-        for (String key : Memory.stackSpace.peek().peek().keySet()) {
-            String id = key;
-            Corevar localCorevar = Memory.stackSpace.peek().peek().get(id);
-            Memory.refCount.set(localCorevar.value, 0);
-        }
+        
         // Pop scope out
         Memory.stackSpace.peek().pop();
+        int prevLiveCount = Memory.liveCount;
         Memory.countLiveRefs();
-        System.out.println("gc:"+Memory.liveCount);
+        if (prevLiveCount!=Memory.liveCount){
+            System.out.println("gc:"+Memory.liveCount);
+        }
     }
 
     public void print(int indent) {

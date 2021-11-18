@@ -136,7 +136,14 @@ public class Assign {
             if (leftvar.type == Core.INT) {
                 leftvar.setvalue(exprnum);
             } else if (leftvar.type == Core.REF) {
-                Utility.illegalAssignBetweenIntAndRef();
+                // If leftvar is a reference type and its corresponding value = null.
+                // Cannot assign value to leftvar.
+                // Print runtime error
+                if (leftvar.value == null) {
+                    Utility.refIndexNull();
+                    System.exit(-1);
+                }
+                Memory.heapSpace.set(leftvar.value, exprnum);
             }
         }
         // Option 1: <assign> ::= id = new;
@@ -157,14 +164,21 @@ public class Assign {
                 // Get the leftvarrefcount and rightrefcount
                 // leftvarrefcount -=1
                 // rightrefcount +=1
-                int leftvarRefCount = Memory.refCount.get(leftvar.value);
-                leftvarRefCount-=1;
-                Memory.refCount.set(leftvar.value, leftvarRefCount);
-                int rightvarRefCount = Memory.refCount.get(rightvar.value);
-                rightvarRefCount+=1;
-                Memory.refCount.set(rightvar.value, rightvarRefCount);
+                if (leftvar.value!=null){
+                    int leftvarRefCount = Memory.refCount.get(leftvar.value);
+                    leftvarRefCount-=1;
+                    Memory.refCount.set(leftvar.value, leftvarRefCount);
+                }
+                if (rightvar.value!=null){
+                    int rightvarRefCount = Memory.refCount.get(rightvar.value);
+                    rightvarRefCount+=1;
+                    Memory.refCount.set(rightvar.value, rightvarRefCount);
+                }
+                int prevLiveCount = Memory.liveCount;
                 Memory.countLiveRefs();
-                System.out.println("gc:"+Memory.liveCount);
+                if (prevLiveCount!=Memory.liveCount){
+                    System.out.println("gc:"+Memory.liveCount);
+                }
             }
         }
     }

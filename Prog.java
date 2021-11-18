@@ -74,6 +74,31 @@ public class Prog {
         // Option 2: <prog> ::= program begin <stmt-seq> end
         stmtseq.execute(inputScanner);
         Memory.stackSpace.pop();
+        
+        Memory.countLiveRefs();
+        for (int i = Memory.liveCount-1; i>-1; i-- ){
+            System.out.println("gc:" + i);
+        }
+        // // Clear all the local variable's corresponding refCount
+        // for (Stack<HashMap<String, Corevar>> stack : Memory.stackSpace){
+        //     for (HashMap <String, Corevar> currentscope : stack){
+        //         // Clear all the local variable's corresponding refCount
+        //         for (String key : currentscope.keySet()) {
+        //             String id = key;
+        //             Corevar localCorevar = currentscope.get(id);
+        //             if(Memory.refCount.get(localCorevar.value)!=0){
+        //                 Memory.refCount.set(localCorevar.value, 0);
+        //                 Memory.liveCount--;
+        //                 System.out.println("gc:" + Memory.liveCount);
+        //             }
+        //         }
+        //     }
+        // }
+        // Memory.countLiveRefs();
+        // if(Memory.refCount.size()>0 && Memory.liveCount!=0){
+        //     System.out.println("gc:"+0);
+        // }
+       
     }
 
     public void print(int indent) {

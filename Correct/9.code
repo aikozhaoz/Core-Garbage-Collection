@@ -1,0 +1,13 @@
+program
+	ref x;
+begin
+	x = new;
+	x = 1;
+	if x<100 then
+		ref x;
+		x = new;
+		x = 10;
+		output x;
+	endif
+	output x;
+end
