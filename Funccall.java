@@ -85,7 +85,6 @@ public class Funccall {
                 if (m.containsKey(actualParam.get(i))) {
                     inGlobal = false;
                     param = m.get(actualParam.get(i));
-
                 }
             }
             // Check globalSpace if the actual parameter does not exist in mainstack.
@@ -109,8 +108,21 @@ public class Funccall {
         Memory.stackSpace.push(funcstack);
         // Now execute function.
         function.getFunctionBody().execute(inputScanner);
+        
+        // Clear all the local variable's corresponding refCount
+        for (HashMap <String, Corevar> currentscope : Memory.stackSpace.peek()) {
+            // Clear all the local variable's corresponding refCount
+            for (String key : currentscope.keySet()) {
+                String id = key;
+                Corevar localCorevar = currentscope.get(id);
+                Memory.refCount.set(localCorevar.value, 0);
+            }
+        }
         // After funtion's execution, pop the function call from the stackSpace.
         Memory.stackSpace.pop();
+
+        Memory.countLiveRefs();
+        System.out.println("gc:"+Memory.liveCount);
     }
 
     public void print() {

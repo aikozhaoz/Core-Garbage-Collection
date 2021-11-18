@@ -81,4 +81,9 @@ public class Utility {
         System.out.println("Runtime Error! ");
         System.out.println("The class you are assigning constant to is null. ");
     }
+
+    public static void illegalAssignBetweenIntAndRef(){
+        System.out.println("Runtime Error! ");
+        System.out.println("Int variables are not allowed to assign to Ref variables. Vice Versa.");
+    }
 }

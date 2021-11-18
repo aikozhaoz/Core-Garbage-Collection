@@ -80,7 +80,16 @@ public class If {
                 Memory.stackSpace.peek().push(scopeone);
                 stmtseqone.execute(inputScanner);
                 // End scope
+                // Clear all the local variable's corresponding refCount
+                for (String key : Memory.stackSpace.peek().peek().keySet()) {
+                    String id = key;
+                    Corevar localCorevar = Memory.stackSpace.peek().peek().get(id);
+                    Memory.refCount.set(localCorevar.value, 0);
+                }
+                // Pop scope out
                 Memory.stackSpace.peek().pop();
+                Memory.countLiveRefs();
+                System.out.println("gc:"+Memory.liveCount);
             }
         } else if (option == 2) {
             if (condition) {
@@ -89,14 +98,32 @@ public class If {
                 Memory.stackSpace.peek().push(scopeone);
                 stmtseqone.execute(inputScanner);
                 // End scope
+                // Clear all the local variable's corresponding refCount
+                for (String key : Memory.stackSpace.peek().peek().keySet()) {
+                    String id = key;
+                    Corevar localCorevar = Memory.stackSpace.peek().peek().get(id);
+                    Memory.refCount.set(localCorevar.value, 0);
+                }
+                // Pop scope out
                 Memory.stackSpace.peek().pop();
+                Memory.countLiveRefs();
+                System.out.println("gc:"+Memory.liveCount);
             } else {
                 // Enter a new scope
                 HashMap<String, Corevar> scopetwo = new HashMap<>();
                 Memory.stackSpace.peek().push(scopetwo);
                 stmtseqtwo.execute(inputScanner);
                 // End scope
+                // Clear all the local variable's corresponding refCount
+                for (String key : Memory.stackSpace.peek().peek().keySet()) {
+                    String id = key;
+                    Corevar localCorevar = Memory.stackSpace.peek().peek().get(id);
+                    Memory.refCount.set(localCorevar.value, 0);
+                }
+                // Pop scope out
                 Memory.stackSpace.peek().pop();
+                Memory.countLiveRefs();
+                System.out.println("gc:"+Memory.liveCount);
             }
         }
     }

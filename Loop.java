@@ -47,8 +47,16 @@ public class Loop {
             stmtseq.execute(inputScanner);
         }
         // End Scope
+        // Clear all the local variable's corresponding refCount
+        for (String key : Memory.stackSpace.peek().peek().keySet()) {
+            String id = key;
+            Corevar localCorevar = Memory.stackSpace.peek().peek().get(id);
+            Memory.refCount.set(localCorevar.value, 0);
+        }
+        // Pop scope out
         Memory.stackSpace.peek().pop();
-
+        Memory.countLiveRefs();
+        System.out.println("gc:"+Memory.liveCount);
     }
 
     public void print(int indent) {

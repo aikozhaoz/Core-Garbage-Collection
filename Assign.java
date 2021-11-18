@@ -136,14 +136,7 @@ public class Assign {
             if (leftvar.type == Core.INT) {
                 leftvar.setvalue(exprnum);
             } else if (leftvar.type == Core.REF) {
-                // If leftvar is a reference type and its corresponding value = null.
-                // Cannot assign value to leftvar.
-                // Print runtime error
-                if (leftvar.value == null) {
-                    Utility.refIndexNull();
-                    System.exit(-1);
-                }
-                Memory.heapSpace.set(leftvar.value, exprnum);
+                Utility.illegalAssignBetweenIntAndRef();
             }
         }
         // Option 1: <assign> ::= id = new;
@@ -151,12 +144,27 @@ public class Assign {
             if (leftvar.type == Core.REF) {
                 Memory.heapSpace.add(leftvar.value);
                 leftvar.value = Memory.heapSpace.size() - 1;
+                Memory.refCount.add(1);
+                Memory.liveCount++;
+                System.out.println("gc:"+Memory.liveCount);
             }
         }
         // Option 2: <assign> ::= id = ref id;
         else if (option == 2) {
             if (leftvar.type == Core.REF && rightvar.type == Core.REF) {
                 leftvar.value = rightvar.value;
+                // Since heapSpace and refCount share the same indexes, for all the ref variables:
+                // Get the leftvarrefcount and rightrefcount
+                // leftvarrefcount -=1
+                // rightrefcount +=1
+                int leftvarRefCount = Memory.refCount.get(leftvar.value);
+                leftvarRefCount-=1;
+                Memory.refCount.set(leftvar.value, leftvarRefCount);
+                int rightvarRefCount = Memory.refCount.get(rightvar.value);
+                rightvarRefCount+=1;
+                Memory.refCount.set(rightvar.value, rightvarRefCount);
+                Memory.countLiveRefs();
+                System.out.println("gc:"+Memory.liveCount);
             }
         }
     }

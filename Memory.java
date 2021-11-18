@@ -6,7 +6,8 @@ public class Memory {
     public static HashMap<String, Funcdecl> functionDeclaration;
     public static Stack<Stack<HashMap<String, Corevar>>> stackSpace;
     public static ArrayList<Integer> heapSpace;
-    private static ArrayList<Integer> refCount;
+    public static ArrayList<Integer> refCount;
+    public static int liveCount;
     public static boolean inGlobal;
 
     // Make the constructor private so that this class cannot be instantiated
@@ -16,6 +17,8 @@ public class Memory {
         functionDeclaration = new HashMap<String, Funcdecl>();
         stackSpace = new Stack<Stack<HashMap<String, Corevar>>>();
         heapSpace = new ArrayList<Integer>();
+        refCount = new ArrayList<Integer>();
+        liveCount = 0;
     }
 
     // Create a private instance of Memory obj
@@ -26,7 +29,14 @@ public class Memory {
         return memory;
     }
 
-    // public static count
+    public static void countLiveRefs(){
+        liveCount = 0;
+        for (int i=0; i<refCount.size(); i++){
+            if (refCount.get(i)!=0){
+                liveCount++;
+            }
+        }
+    }
 
 
 }
